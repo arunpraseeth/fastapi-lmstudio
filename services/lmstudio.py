@@ -3,7 +3,7 @@
 """Service layer for LM Studio API communication."""
 import httpx
 from fastapi import HTTPException
-from models.schemas import ChatMessage, LMStudioRequest, AskRequest
+from models.schemas import ChatMessage, LMStudioRequest
 
 from config import (
     LM_STUDIO_MODELS_URL,
@@ -25,6 +25,7 @@ async def get_available_models():
 
 
 async def generate_response(prompt: str) -> str:
+    cleaned_prompt = prompt.replace("\\'", "'").replace("\\", "")
     """
     Generate AI response from LM Studio.
     
@@ -40,7 +41,7 @@ async def generate_response(prompt: str) -> str:
         temperature=DEFAULT_TEMPERATURE,
         max_tokens=DEFAULT_MAX_TOKENS,
         stream=DEFAULT_STREAM,
-        messages=[ChatMessage(role="user", content=prompt)]
+        messages=[ChatMessage(role="user", content=cleaned_prompt)]
     ).model_dump(exclude_none=True)
 
     # Send request
